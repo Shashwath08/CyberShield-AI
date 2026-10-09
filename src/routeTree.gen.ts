@@ -10,6 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuideRouteImport } from './routes/guide'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as MessageRouteImport } from './routes/message'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as UrlRouteImport } from './routes/url'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiAnalyzeMessageRouteImport } from './routes/api/analyze.message'
 import { Route as ApiAnalyzeUrlRouteImport } from './routes/api/analyze.url'
@@ -17,6 +22,31 @@ import { Route as ApiAnalyzeUrlRouteImport } from './routes/api/analyze.url'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessageRoute = MessageRouteImport.update({
+  id: '/message',
+  path: '/message',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UrlRoute = UrlRouteImport.update({
+  id: '/url',
+  path: '/url',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -37,12 +67,22 @@ const ApiAnalyzeUrlRoute = ApiAnalyzeUrlRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/guide': typeof GuideRoute
+  '/history': typeof HistoryRoute
+  '/message': typeof MessageRoute
+  '/settings': typeof SettingsRoute
+  '/url': typeof UrlRoute
   '/api/health': typeof ApiHealthRoute
   '/api/analyze/message': typeof ApiAnalyzeMessageRoute
   '/api/analyze/url': typeof ApiAnalyzeUrlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/guide': typeof GuideRoute
+  '/history': typeof HistoryRoute
+  '/message': typeof MessageRoute
+  '/settings': typeof SettingsRoute
+  '/url': typeof UrlRoute
   '/api/health': typeof ApiHealthRoute
   '/api/analyze/message': typeof ApiAnalyzeMessageRoute
   '/api/analyze/url': typeof ApiAnalyzeUrlRoute
@@ -50,18 +90,46 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/guide': typeof GuideRoute
+  '/history': typeof HistoryRoute
+  '/message': typeof MessageRoute
+  '/settings': typeof SettingsRoute
+  '/url': typeof UrlRoute
   '/api/health': typeof ApiHealthRoute
   '/api/analyze/message': typeof ApiAnalyzeMessageRoute
   '/api/analyze/url': typeof ApiAnalyzeUrlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/health' | '/api/analyze/message' | '/api/analyze/url'
+  fullPaths:
+    | '/'
+    | '/guide'
+    | '/history'
+    | '/message'
+    | '/settings'
+    | '/url'
+    | '/api/health'
+    | '/api/analyze/message'
+    | '/api/analyze/url'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/health' | '/api/analyze/message' | '/api/analyze/url'
+  to:
+    | '/'
+    | '/guide'
+    | '/history'
+    | '/message'
+    | '/settings'
+    | '/url'
+    | '/api/health'
+    | '/api/analyze/message'
+    | '/api/analyze/url'
   id:
     | '__root__'
     | '/'
+    | '/guide'
+    | '/history'
+    | '/message'
+    | '/settings'
+    | '/url'
     | '/api/health'
     | '/api/analyze/message'
     | '/api/analyze/url'
@@ -69,6 +137,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GuideRoute: typeof GuideRoute
+  HistoryRoute: typeof HistoryRoute
+  MessageRoute: typeof MessageRoute
+  SettingsRoute: typeof SettingsRoute
+  UrlRoute: typeof UrlRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiAnalyzeMessageRoute: typeof ApiAnalyzeMessageRoute
   ApiAnalyzeUrlRoute: typeof ApiAnalyzeUrlRoute
@@ -81,6 +154,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/message': {
+      id: '/message'
+      path: '/message'
+      fullPath: '/message'
+      preLoaderRoute: typeof MessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/url': {
+      id: '/url'
+      path: '/url'
+      fullPath: '/url'
+      preLoaderRoute: typeof UrlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -109,6 +217,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GuideRoute: GuideRoute,
+  HistoryRoute: HistoryRoute,
+  MessageRoute: MessageRoute,
+  SettingsRoute: SettingsRoute,
+  UrlRoute: UrlRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiAnalyzeMessageRoute: ApiAnalyzeMessageRoute,
   ApiAnalyzeUrlRoute: ApiAnalyzeUrlRoute,
