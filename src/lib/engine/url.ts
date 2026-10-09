@@ -133,22 +133,45 @@ export function parseUrl(raw: string): ParsedUrl {
   }
   if (!ALLOWED_SCHEMES.has(url.protocol))
     throw new InputError("Only http and https links can be analysed.");
-  if (!isValidHostname(url.hostname)) throw new InputError("The hostname is malformed.");
+  if (!isValidHostname(url.hostname)) {
+    throw new InputError(
+      "Please enter a valid web address with a hostname, such as https://example.com.",
+    );
+  }
   return { url, normalized: url.href };
 }
 
 function isValidHostname(host: string): boolean {
   if (!host || host.length > 253) return false;
-  if (host.startsWith("[")) return true; // IPv6 literal, already validated by URL
-  const labels = host.replace(/\.$/, "").split(".");
-  return labels.every(
-    (l) =>
-      l.length > 0 &&
-      l.length <= 63 &&
-      /^[a-z0-9_-]+$/i.test(l) &&
-      !l.startsWith("-") &&
-      !l.endsWith("-"),
-  );
+  // URL validates IPv6 literals; accept them without domain-label checks.
+  if (host.startsWith("[") && host.endsWith("]")) return true;
+
+  // Accept IPv4 literals only when every octet is in range.
+  if (/^\\d{1,3}(\\.\\d{1,3}){3}$/.test(host)) {
+    return host.split(".").every((part) => Number(part) >= 0 && Number(part) <= 255);
+  }
+
+  const normalized = host.replace(/\\.$/, "").toLowerCase();
+  // Keep localhost for local development, but reject single-label text
+  // such as "not-a-valid-url" before running risk analysis.
+  if (normalized !== "localhost" && !normalized.includes(".")) return false;
+
+  const labels = normalized.split(".");
+  if (
+    !labels.every(
+      (label) =>
+        label.length > 0 &&
+        label.length <= 63 &&
+        /^[a-z0-9-]+$/i.test(label) &&
+        !label.startsWith("-") &&
+        !label.endsWith("-"),
+    )
+  ) {
+    return false;
+  }
+
+  const tld = labels[labels.length - 1] ?? "";
+  return normalized === "localhost" || /^(?:[a-z]{2,63}|xn--[a-z0-9-]{2,59})$/i.test(tld);
 }
 
 export function isIpHost(host: string): boolean {
