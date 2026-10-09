@@ -10,33 +10,68 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiAnalyzeMessageRouteImport } from './routes/api/analyze.message'
+import { Route as ApiAnalyzeUrlRouteImport } from './routes/api/analyze.url'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAnalyzeMessageRoute = ApiAnalyzeMessageRouteImport.update({
+  id: '/api/analyze/message',
+  path: '/api/analyze/message',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAnalyzeUrlRoute = ApiAnalyzeUrlRouteImport.update({
+  id: '/api/analyze/url',
+  path: '/api/analyze/url',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/analyze/message': typeof ApiAnalyzeMessageRoute
+  '/api/analyze/url': typeof ApiAnalyzeUrlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/analyze/message': typeof ApiAnalyzeMessageRoute
+  '/api/analyze/url': typeof ApiAnalyzeUrlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/analyze/message': typeof ApiAnalyzeMessageRoute
+  '/api/analyze/url': typeof ApiAnalyzeUrlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/health' | '/api/analyze/message' | '/api/analyze/url'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/health' | '/api/analyze/message' | '/api/analyze/url'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/health'
+    | '/api/analyze/message'
+    | '/api/analyze/url'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiHealthRoute: typeof ApiHealthRoute
+  ApiAnalyzeMessageRoute: typeof ApiAnalyzeMessageRoute
+  ApiAnalyzeUrlRoute: typeof ApiAnalyzeUrlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +83,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/analyze/message': {
+      id: '/api/analyze/message'
+      path: '/api/analyze/message'
+      fullPath: '/api/analyze/message'
+      preLoaderRoute: typeof ApiAnalyzeMessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/analyze/url': {
+      id: '/api/analyze/url'
+      path: '/api/analyze/url'
+      fullPath: '/api/analyze/url'
+      preLoaderRoute: typeof ApiAnalyzeUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiHealthRoute: ApiHealthRoute,
+  ApiAnalyzeMessageRoute: ApiAnalyzeMessageRoute,
+  ApiAnalyzeUrlRoute: ApiAnalyzeUrlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
