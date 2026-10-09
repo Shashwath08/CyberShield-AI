@@ -15,9 +15,14 @@ export function ScanStatus({ state }: { state: State }) {
         </p>
       )}
       {state.status === "error" && (
-        <p role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm">
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm"
+        >
           <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-destructive" />
-          <span><strong>Could not analyse:</strong> {state.message}</span>
+          <span>
+            <strong>Could not analyse:</strong> {state.message}
+          </span>
         </p>
       )}
       {state.status === "success" && <ResultPanel result={state.result} />}

@@ -30,7 +30,10 @@ const errorBody = (code: string, message: string) => ({ error: { code, message }
 /** Fixed-window limiter. Per server instance only — see SECURITY.md. */
 export class RateLimiter {
   private hits = new Map<string, { count: number; reset: number }>();
-  constructor(private readonly limit: number, private readonly windowMs: number) {}
+  constructor(
+    private readonly limit: number,
+    private readonly windowMs: number,
+  ) {}
 
   allow(key: string, now = Date.now()): boolean {
     const entry = this.hits.get(key);
@@ -47,7 +50,11 @@ export class RateLimiter {
 const limiter = new RateLimiter(30, 60_000);
 
 function clientKey(request: Request): string {
-  return request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
+  return (
+    request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "anonymous"
+  );
 }
 
 async function readJson(request: Request): Promise<unknown> {
@@ -63,37 +70,58 @@ async function readJson(request: Request): Promise<unknown> {
 }
 
 /** Centralised error handling: generic messages, no stack traces, no input echo in logs. */
-async function guarded(request: Request, work: () => Promise<Response>, rl: RateLimiter = limiter): Promise<Response> {
-  if (!rl.allow(clientKey(request))) return json(errorBody("rate_limited", "Too many requests. Please wait a minute."), 429, { "retry-after": "60" });
+async function guarded(
+  request: Request,
+  work: () => Promise<Response>,
+  rl: RateLimiter = limiter,
+): Promise<Response> {
+  if (!rl.allow(clientKey(request)))
+    return json(errorBody("rate_limited", "Too many requests. Please wait a minute."), 429, {
+      "retry-after": "60",
+    });
   try {
     return await work();
   } catch (err) {
     if (err instanceof InputError) return json(errorBody("invalid_input", err.message), 422);
-    if (err instanceof z.ZodError) return json(errorBody("invalid_request", err.issues[0]?.message ?? "Invalid request."), 422);
+    if (err instanceof z.ZodError)
+      return json(errorBody("invalid_request", err.issues[0]?.message ?? "Invalid request."), 422);
     console.error("analysis failed:", err instanceof Error ? err.name : "unknown");
-    return json(errorBody("internal_error", "Something went wrong while analysing. Please try again."), 500);
+    return json(
+      errorBody("internal_error", "Something went wrong while analysing. Please try again."),
+      500,
+    );
   }
 }
 
 export interface ApiDeps {
-  safeBrowsingKey?: string;
-  fetchImpl?: typeof fetch;
+  safeBrowsingKey?: string | undefined;
+  fetchImpl?: typeof fetch | undefined;
   rateLimiter?: RateLimiter;
 }
 
 export function handleAnalyzeUrl(request: Request, deps: ApiDeps = {}): Promise<Response> {
-  return guarded(request, async () => {
-    const { url } = UrlRequest.parse(await readJson(request));
-    const result = await analyzeUrl(url, (u) => checkReputation(u, deps.safeBrowsingKey, deps.fetchImpl));
-    return json(result);
-  }, deps.rateLimiter);
+  return guarded(
+    request,
+    async () => {
+      const { url } = UrlRequest.parse(await readJson(request));
+      const result = await analyzeUrl(url, (u) =>
+        checkReputation(u, deps.safeBrowsingKey, deps.fetchImpl),
+      );
+      return json(result);
+    },
+    deps.rateLimiter,
+  );
 }
 
 export function handleAnalyzeMessage(request: Request, deps: ApiDeps = {}): Promise<Response> {
-  return guarded(request, async () => {
-    const { message } = MessageRequest.parse(await readJson(request));
-    return json(analyzeMessage(message));
-  }, deps.rateLimiter);
+  return guarded(
+    request,
+    async () => {
+      const { message } = MessageRequest.parse(await readJson(request));
+      return json(analyzeMessage(message));
+    },
+    deps.rateLimiter,
+  );
 }
 
 export function handleHealth(deps: ApiDeps = {}): Response {

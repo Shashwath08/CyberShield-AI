@@ -68,7 +68,10 @@ function persist(records: ScanRecord[]) {
 export function getSettings(): Settings {
   if (settingsCache) return settingsCache;
   try {
-    settingsCache = { saveHistory: true, ...(JSON.parse(storage()?.getItem(SETTINGS_KEY) ?? "{}") as Partial<Settings>) };
+    settingsCache = {
+      saveHistory: true,
+      ...(JSON.parse(storage()?.getItem(SETTINGS_KEY) ?? "{}") as Partial<Settings>),
+    };
   } catch {
     settingsCache = { saveHistory: true };
   }
@@ -83,7 +86,8 @@ export function updateSettings(next: Partial<Settings>) {
 
 export function saveScan(result: AnalysisResult): ScanRecord | null {
   if (!getSettings().saveHistory) return null;
-  const preview = result.input.length > PREVIEW_LEN ? `${result.input.slice(0, PREVIEW_LEN)}…` : result.input;
+  const preview =
+    result.input.length > PREVIEW_LEN ? `${result.input.slice(0, PREVIEW_LEN)}…` : result.input;
   const record: ScanRecord = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
@@ -92,7 +96,14 @@ export function saveScan(result: AnalysisResult): ScanRecord | null {
     score: result.score,
     level: result.level,
     // Keep full text only for URLs; messages keep a preview to minimise stored personal data.
-    result: result.type === "message" ? { ...result, input: preview, indicators: result.indicators.map(({ span: _s, ...rest }) => rest) } : result,
+    result:
+      result.type === "message"
+        ? {
+            ...result,
+            input: preview,
+            indicators: result.indicators.map(({ span: _s, ...rest }) => rest),
+          }
+        : result,
   };
   persist([record, ...loadHistory()].slice(0, MAX_RECORDS));
   return record;
@@ -125,7 +136,12 @@ export function queryHistory(records: readonly ScanRecord[], q: HistoryQuery) {
   const pageSize = q.pageSize ?? 10;
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const page = Math.min(Math.max(1, q.page ?? 1), pages);
-  return { items: filtered.slice((page - 1) * pageSize, page * pageSize), total: filtered.length, page, pages };
+  return {
+    items: filtered.slice((page - 1) * pageSize, page * pageSize),
+    total: filtered.length,
+    page,
+    pages,
+  };
 }
 
 export function historyStats(records: readonly ScanRecord[]) {

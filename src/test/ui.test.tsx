@@ -3,7 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { analyzeMessage } from "@/lib/engine/analyze";
 import { handleAnalyzeUrl, RateLimiter } from "@/server/api";
-import { clearHistory, historyStats, loadHistory, queryHistory, resetHistoryCache, saveScan, updateSettings } from "@/services/history";
+import {
+  clearHistory,
+  historyStats,
+  loadHistory,
+  queryHistory,
+  resetHistoryCache,
+  saveScan,
+  updateSettings,
+} from "@/services/history";
 
 vi.mock("@tanstack/react-router", async (orig) => ({
   ...(await orig<typeof import("@tanstack/react-router")>()),
@@ -17,13 +25,16 @@ const { HistoryPage } = await import("@/routes/history");
 /** Route fetch calls into the real server handlers — an integration path with no network. */
 function wireFetchToHandlers(delayMs = 0) {
   const rateLimiter = new RateLimiter(1000, 60_000);
-  vi.stubGlobal("fetch", vi.fn(async (input: string, init?: RequestInit) => {
-    if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
-    const request = new Request(`http://localhost${input}`, init);
-    if (input === "/api/analyze/url") return handleAnalyzeUrl(request, { rateLimiter });
-    const { handleAnalyzeMessage } = await import("@/server/api");
-    return handleAnalyzeMessage(request, { rateLimiter });
-  }));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: string, init?: RequestInit) => {
+      if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
+      const request = new Request(`http://localhost${input}`, init);
+      if (input === "/api/analyze/url") return handleAnalyzeUrl(request, { rateLimiter });
+      const { handleAnalyzeMessage } = await import("@/server/api");
+      return handleAnalyzeMessage(request, { rateLimiter });
+    }),
+  );
 }
 
 beforeEach(() => {
@@ -47,7 +58,9 @@ describe("URL scanner page", () => {
     fireEvent.submit(input.closest("form")!);
     expect(await screen.findByText(/Analysing/)).toBeInTheDocument();
     const result = await screen.findByRole("article");
-    expect(within(result).getByRole("img", { name: /risk score \d+ out of 100/i })).toBeInTheDocument();
+    expect(
+      within(result).getByRole("img", { name: /risk score \d+ out of 100/i }),
+    ).toBeInTheDocument();
     expect(within(result).getByRole("heading", { name: "What you should do" })).toBeInTheDocument();
     expect(loadHistory()).toHaveLength(1);
   });
@@ -74,7 +87,9 @@ describe("Message analyzer page", () => {
     wireFetchToHandlers();
     render(<MessageAnalyzerPage />);
     const box = screen.getByLabelText("Message text");
-    fireEvent.change(box, { target: { value: "<img src=x onerror=alert(1)> Please share the OTP now" } });
+    fireEvent.change(box, {
+      target: { value: "<img src=x onerror=alert(1)> Please share the OTP now" },
+    });
     fireEvent.click(screen.getByRole("button", { name: /analyse message/i }));
     const mark = await waitFor(() => {
       const m = document.querySelector("mark");

@@ -15,9 +15,15 @@ export const Route = createFileRoute("/url")({
   head: () => ({
     meta: [
       { title: "URL Scanner — CyberShield AI" },
-      { name: "description", content: "Check a suspicious link for phishing tricks without ever opening it." },
+      {
+        name: "description",
+        content: "Check a suspicious link for phishing tricks without ever opening it.",
+      },
       { property: "og:title", content: "URL Scanner — CyberShield AI" },
-      { property: "og:description", content: "Check a suspicious link for phishing tricks without ever opening it." },
+      {
+        property: "og:description",
+        content: "Check a suspicious link for phishing tricks without ever opening it.",
+      },
     ],
   }),
   component: UrlScannerPage,
@@ -40,14 +46,32 @@ export function UrlScannerPage() {
       <form onSubmit={onSubmit} className="mb-8 space-y-3" noValidate>
         <Label htmlFor="url-input">Link to check</Label>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Input id="url-input" name="url" type="text" inputMode="url" autoComplete="off" spellCheck={false}
-            placeholder="https://example.com/login" value={url} maxLength={LIMITS.urlMaxLength}
-            onChange={(e) => setUrl(e.target.value)} aria-describedby="url-help" className="h-11 font-mono" />
-          <Button type="submit" size="lg" className="h-11" disabled={state.status === "loading" || !url.trim()}>
+          <Input
+            id="url-input"
+            name="url"
+            type="text"
+            inputMode="url"
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="https://example.com/login"
+            value={url}
+            maxLength={LIMITS.urlMaxLength}
+            onChange={(e) => setUrl(e.target.value)}
+            aria-describedby="url-help"
+            className="h-11 font-mono"
+          />
+          <Button
+            type="submit"
+            size="lg"
+            className="h-11"
+            disabled={state.status === "loading" || !url.trim()}
+          >
             <Link2 aria-hidden="true" /> Analyse link
           </Button>
         </div>
-        <p id="url-help" className="text-xs text-muted-foreground">Only http and https links. Max {LIMITS.urlMaxLength} characters.</p>
+        <p id="url-help" className="text-xs text-muted-foreground">
+          Only http and https links. Max {LIMITS.urlMaxLength} characters.
+        </p>
       </form>
       <ScanStatus state={state} />
     </>

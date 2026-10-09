@@ -80,7 +80,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "CyberShield AI — Phishing & Scam Detector" },
-      { name: "description", content: "Check suspicious links and messages for phishing and scams, with clear evidence and advice." },
+      {
+        name: "description",
+        content:
+          "Check suspicious links and messages for phishing and scams, with clear evidence and advice.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
