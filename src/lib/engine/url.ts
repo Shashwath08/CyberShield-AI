@@ -110,7 +110,7 @@ export function parseUrl(raw: string): ParsedUrl {
   if (input.length > LIMITS.urlMaxLength) {
     throw new InputError(`URL is too long (max ${LIMITS.urlMaxLength} characters).`);
   }
-  if (/[\s\u0000-\u001f]/.test(input))
+  if (/\s/.test(input) || [...input].some((c) => c.charCodeAt(0) < 32))
     throw new InputError("URL must not contain spaces or control characters.");
 
   const scheme = SCHEME_RE.exec(input)?.[1]?.toLowerCase();
