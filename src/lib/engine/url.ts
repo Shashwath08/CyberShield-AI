@@ -340,6 +340,20 @@ function addDomainIndicators(host: string, add: (i: Indicator) => void): void {
     .split(".")
     .filter(Boolean);
   const tld = host.split(".").pop() ?? "";
+    const credentialSubdomain = subLabels.find((label) =>
+    CREDENTIAL_WORDS.test(label),
+  );
+
+  if (credentialSubdomain) {
+    add({
+      id: "credential-subdomain",
+      group: "suspicious",
+      title: "Login or verification wording in subdomain",
+      kind: "suspicious",
+      weight: 20,
+      evidence: `The subdomain "${credentialSubdomain}" contains login or account-related wording. This can occur on legitimate websites too.`,
+    });
+  }
 
   const brandInSub = subLabels.map(brandOf).find(Boolean);
   const ownBrand = brandOf(sldLabel);
