@@ -20,7 +20,7 @@ describe("URL validation", () => {
       expect(() => parseUrl(u)).toThrow(InputError);
     },
   );
-  it.each(["", "   ", "http://", "http://exa mple.com", "http://-bad-.com", "http://a..b.com"])(
+  it.each(["", "   ", "not-a-valid-url", "http://", "http://exa mple.com", "http://-bad-.com", "http://a..b.com", "https://example.com:70000", "http://256.1.1.1"])(
     "rejects malformed %j",
     (u) => {
       expect(() => parseUrl(u)).toThrow(InputError);
