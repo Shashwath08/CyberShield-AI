@@ -276,15 +276,32 @@ export function urlIndicators(parsed: ParsedUrl, raw: string): Indicator[] {
     });
   }
 
-  const encodedCount = (raw.match(/%[0-9a-f]{2}/gi) ?? []).length;
-  if (/%25[0-9a-f]{2}/i.test(raw) || encodedCount >= 6) {
+    const encodedCount = (raw.match(/%[0-9a-f]{2}/gi) ?? []).length;
+
+  if (
+    /%25[0-9a-f]{2}/i.test(raw) ||
+    encodedCount >= 6
+  ) {
     add({
-      id: "encoding",
+      id: "encoded-url",
       group: "obfuscation",
-      title: "Heavy or double URL encoding",
+      title: "Heavily encoded URL",
       kind: "suspicious",
       weight: 15,
-      evidence: `The link contains ${encodedCount} percent-encoded sequences${/%25/i.test(raw) ? " including double encoding" : ""}, a technique used to hide text from readers and filters.`,
+      evidence:
+        "The URL contains repeated or double encoding that may obscure its intended meaning.",
+    });
+  }
+
+  if (/(?:%2e|\.)(?:%2e|\.)(?:%2f|\/|%5c)/i.test(raw)) {
+    add({
+      id: "encoded-traversal",
+      group: "obfuscation",
+      title: "Encoded directory-traversal pattern",
+      kind: "suspicious",
+      weight: 25,
+      evidence:
+        "The original URL contains dot-segments or encoded separators that may obscure its intended path.",
     });
   }
 
