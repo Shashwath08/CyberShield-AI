@@ -94,10 +94,8 @@ function findMatch(text: string, rule: MessageRule): { text: string; index: numb
   const re = new RegExp(rule.pattern.source, rule.pattern.flags.includes("g") ? rule.pattern.flags : `${rule.pattern.flags}g`);
   for (const m of text.matchAll(re)) {
     const index = m.index ?? 0;
-    if (rule.negatable && NEGATION_RE.test(text.slice(Math.max(0, index - 25), index + m[0].length))) {
-      // "Do not share this OTP" is protective advice, not a request.
-      if (NEGATION_RE.test(text.slice(Math.max(0, index - 25), index)) || /\b(not|never|don'?t)\b/i.test(m[0])) continue;
-    }
+    // "Do not share this OTP" is protective advice, not a request.
+    if (rule.negatable && NEGATION_RE.test(text.slice(Math.max(0, index - 25), index))) continue;
     return { text: m[0], index };
   }
   return undefined;
