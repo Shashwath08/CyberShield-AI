@@ -15,9 +15,10 @@ const { MessageAnalyzerPage } = await import("@/routes/message");
 const { HistoryPage } = await import("@/routes/history");
 
 /** Route fetch calls into the real server handlers — an integration path with no network. */
-function wireFetchToHandlers() {
+function wireFetchToHandlers(delayMs = 0) {
   const rateLimiter = new RateLimiter(1000, 60_000);
   vi.stubGlobal("fetch", vi.fn(async (input: string, init?: RequestInit) => {
+    if (delayMs) await new Promise((r) => setTimeout(r, delayMs));
     const request = new Request(`http://localhost${input}`, init);
     if (input === "/api/analyze/url") return handleAnalyzeUrl(request, { rateLimiter });
     const { handleAnalyzeMessage } = await import("@/server/api");
@@ -38,8 +39,8 @@ describe("URL scanner page", () => {
     expect(screen.getByLabelText("Link to check")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /analyse link/i })).toBeDisabled();
   });
-  it("submits via keyboard Enter, shows loading then results, and saves history", async () => {
-    wireFetchToHandlers();
+  it("submits the form, shows loading then results, and saves history", async () => {
+    wireFetchToHandlers(50);
     render(<UrlScannerPage />);
     const input = screen.getByLabelText("Link to check");
     fireEvent.change(input, { target: { value: "http://paypal.com.secure-verify.xyz/login" } });

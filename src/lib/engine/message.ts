@@ -26,7 +26,7 @@ export const MESSAGE_RULES: readonly MessageRule[] = [
   { id: "urgency", group: "urgency", title: "Creates artificial urgency", weight: 15,
     pattern: /\b(urgent(ly)?|immediately|within \d+ ?(hours?|hrs|minutes|mins)|today itself|last (warning|chance|reminder)|act now|expires? (today|tonight|soon)|final notice)\b/i,
     explain: "Pressure to act quickly is a classic social-engineering tactic." },
-  { id: "kyc", group: "kyc", title: "KYC update demand", weight: 25,
+  { id: "kyc", group: "kyc", title: "KYC update demand", weight: 30,
     pattern: /\bkyc\b[^.!?\n]{0,40}\b(update|expired?|pending|verify|complete|incomplete)\b/i,
     explain: "Fake KYC alerts are one of the most common banking scams. Banks handle KYC through branches or official apps." },
   { id: "bank-impersonation", group: "impersonation", title: "Claims to be from a bank or payment service", weight: 12,
